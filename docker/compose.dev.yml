@@ -1,0 +1,15 @@
+services:
+  mk_server:
+    container_name: mk_server
+    restart: always
+    build:
+      context: "../server"
+      dockerfile: Dockerfile
+      target: development
+    ports:
+      - "3000:3000"
+    env_file:
+      - ../server/.env
+    volumes:
+      - ../server/src:/app/src
+      - /app/node_modules
