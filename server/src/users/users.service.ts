@@ -16,4 +16,8 @@ export class UsersService {
 
     return user;
   }
+
+  getAll(): IUser[] {
+    return this.users;
+  }
 }
