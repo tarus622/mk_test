@@ -13,7 +13,7 @@ export class AuthService implements IAuthService {
 
   async validateUser(email: string, password: string): Promise<any> {
     const user = this.usersService.findByEmail(email);
-    if (user && await bcrypt.compare(password, user.getPassword())) {
+    if (user && (await bcrypt.compare(password, user.getPassword()))) {
       return user;
     }
     return null;
@@ -22,14 +22,23 @@ export class AuthService implements IAuthService {
   async login(user: any) {
     const payload = { email: user.email, sub: user.id };
 
-    const access_token = await this.jwtService.signAsync(payload, {
-      expiresIn: '15m',
-    });
-    const refresh_token = await this.jwtService.signAsync(payload, {
-      expiresIn: '7d',
-    });
+    const access_token = await this.jwtService.signAsync(
+      { ...payload, type: 'access' },
+      {
+        expiresIn: '15m',
+      },
+    );
+    const refresh_token = await this.jwtService.signAsync(
+      { ...payload, type: 'refresh' },
+      {
+        expiresIn: '7d',
+      },
+    );
 
-    this.usersService.updateRefreshToken(user.id, refresh_token);
+    const salt = await bcrypt.genSalt(10);
+    const hashedToken = await bcrypt.hash(refresh_token, salt);
+
+    this.usersService.updateRefreshToken(user.id, hashedToken);
 
     return { access_token, refresh_token };
   }
@@ -38,9 +47,16 @@ export class AuthService implements IAuthService {
     try {
       const payload = await this.jwtService.verifyAsync(refreshToken);
 
+      if (payload.type !== 'refresh') {
+        throw new UnauthorizedException('Invalid token type');
+      }
+
       const user = this.usersService.findById(payload.sub);
 
-      const isMatch = await bcrypt.compare(refreshToken, user?.getRefreshToken());
+      const isMatch = await bcrypt.compare(
+        refreshToken,
+        user?.getRefreshToken(),
+      );
 
       if (!isMatch) throw new UnauthorizedException();
 
