@@ -2,7 +2,7 @@ export class User {
   private id: string;
   private email: string;
   private password: string;
-  private refresh_token: string;
+  private refresh_token?: string;
 
   constructor(id: string, email: string, password: string) {
     this.id = id;

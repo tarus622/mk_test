@@ -13,6 +13,10 @@ export class UsersRepository implements IUserRepository {
     return user;
   }
 
+  getAll(): User[] {
+    return this.users;
+  }
+
   findByEmail(email: string): User | null {
     const user = this.users.find((user: User) => user.getEmail() === email);
 
@@ -29,11 +33,11 @@ export class UsersRepository implements IUserRepository {
     return user;
   }
 
-  updateRefreshToken(id: string, token: string): string {
+  updateRefreshToken(id: string, token: string): string | null {
     const user = this.users.find((user: User) => user.getId() === id);
     if (!user) throw new HttpException('User not found', 404);
 
     user.setRefreshToken(token);
-    return user.getRefreshToken();
+    return user.getRefreshToken() || null;
   }
 }

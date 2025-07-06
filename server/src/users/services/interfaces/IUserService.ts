@@ -1,8 +1,9 @@
-import { User } from 'src/users/entities/User';
-import { CreateUserDto } from '../dtos/create-user.dto';
+import { CreateUserDto } from '../types/create-user-data';
+import { PublicUserDto } from '../types/public-user-data';
 
 export interface IUserService {
-  create(data: CreateUserDto): Promise<User>;
-  findByEmail(email: string): User | null;
-  findById(id: string): User | null;
+  create(data: CreateUserDto): Promise<PublicUserDto>;
+  getAllUsers(): PublicUserDto[];
+  findPublicByEmail(email: string): PublicUserDto | null;
+  findPublicById(id: string): PublicUserDto | null;
 }

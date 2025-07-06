@@ -1,4 +1,4 @@
-import { User } from 'src/users/entities/User';
+import { User } from "src/users/entities/User";
 
 export interface IUserRepository {
   create(email: string, password: string): User;
