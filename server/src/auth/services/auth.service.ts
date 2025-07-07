@@ -3,12 +3,14 @@ import { UsersService } from 'src/users/services/users.service';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { IAuthService } from './interfaces/IAuthService';
+import { I18nService, I18nContext } from 'nestjs-i18n';
 
 @Injectable()
 export class AuthService implements IAuthService {
   constructor(
     private usersService: UsersService,
     private jwtService: JwtService,
+    private i18n: I18nService
   ) {}
 
   async validateUser(email: string, password: string): Promise<any> {
@@ -58,7 +60,7 @@ export class AuthService implements IAuthService {
         user?.getRefreshToken(),
       );
 
-      if (!isMatch) throw new UnauthorizedException();
+      if (!isMatch) throw new UnauthorizedException('Invalid refresh token');
 
       return this.login(user);
     } catch {

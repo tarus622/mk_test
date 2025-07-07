@@ -1,0 +1,6 @@
+{
+  "email": "email",
+  "password": "password",
+  "INVALID_EMAIL": "Please enter a valid email.",
+  "NOT_EMPTY": "This field cannot be empty."
+}
