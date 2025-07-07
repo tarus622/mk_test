@@ -1,6 +1,6 @@
 {
-  "email": "email",
-  "password": "senha",
   "INVALID_EMAIL": "Por favor, insira um e-mail válido.",
-  "NOT_EMPTY": "Este campo não pode estar vazio."
+  "NOT_EMPTY": "Este campo não pode estar vazio.",
+  "INVALID_ACCESS_TOKEN": "Token de acesso inválido.",
+  "INVALID_REFRESH_TOKEN": "Token de refresh inválido."
 }

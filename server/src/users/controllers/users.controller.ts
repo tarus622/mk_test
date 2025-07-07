@@ -18,11 +18,10 @@ import { I18nService, I18nContext, I18n } from 'nestjs-i18n';
 @UseFilters(new HttpExceptionFilter())
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService, private readonly i18n: I18nService) {}
+  constructor(private readonly usersService: UsersService) {}
 
   @Post()
   createUser(
-    @I18n() i18nContext: I18nContext,
     @Body() data: CreateUserDto,
   ): Promise<PublicUserData> {
     const user = this.usersService.create(data);

@@ -2,9 +2,11 @@ import { HttpException, Injectable } from '@nestjs/common';
 import { User } from '../entities/User';
 import { v4 as uuid } from 'uuid';
 import { IUserRepository } from './interfaces/IUserRepository';
+import { I18nService } from 'nestjs-i18n';
 
 @Injectable()
 export class UsersRepository implements IUserRepository {
+  constructor(private i18n: I18nService){}
   private users: User[] = [];
 
   create(email: string, password: string): User {
@@ -35,7 +37,7 @@ export class UsersRepository implements IUserRepository {
 
   updateRefreshToken(id: string, token: string): string | null {
     const user = this.users.find((user: User) => user.getId() === id);
-    if (!user) throw new HttpException('User not found', 404);
+    if (!user) throw new HttpException(this.i18n.t('users.USER_NOT_FOUND'), 404);
 
     user.setRefreshToken(token);
     return user.getRefreshToken() || null;

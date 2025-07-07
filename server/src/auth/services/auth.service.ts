@@ -3,14 +3,14 @@ import { UsersService } from 'src/users/services/users.service';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { IAuthService } from './interfaces/IAuthService';
-import { I18nService, I18nContext } from 'nestjs-i18n';
+import { I18nService } from 'nestjs-i18n';
 
 @Injectable()
 export class AuthService implements IAuthService {
   constructor(
     private usersService: UsersService,
     private jwtService: JwtService,
-    private i18n: I18nService
+    private i18n: I18nService,
   ) {}
 
   async validateUser(email: string, password: string): Promise<any> {
@@ -46,25 +46,31 @@ export class AuthService implements IAuthService {
   }
 
   async refreshToken(refreshToken: string) {
+    let payload: any;
+
     try {
-      const payload = await this.jwtService.verifyAsync(refreshToken);
-
-      if (payload.type !== 'refresh') {
-        throw new UnauthorizedException('Invalid token type');
-      }
-
-      const user = this.usersService.findById(payload.sub);
-
-      const isMatch = await bcrypt.compare(
-        refreshToken,
-        user?.getRefreshToken(),
-      );
-
-      if (!isMatch) throw new UnauthorizedException('Invalid refresh token');
-
-      return this.login(user);
-    } catch {
-      throw new UnauthorizedException();
+      payload = await this.jwtService.verifyAsync(refreshToken);
+    } catch (err) {
+      throw new UnauthorizedException({
+        message: this.i18n.t('auth.INVALID_REFRESH_TOKEN'),
+      });
     }
+
+    if (payload.type !== 'refresh') { 
+      throw new UnauthorizedException({
+        message: this.i18n.t('auth.INVALID_REFRESH_TOKEN'),
+      });
+    }
+
+    const user = this.usersService.findById(payload.sub);
+
+    const isMatch = await bcrypt.compare(refreshToken, user?.getRefreshToken());
+
+    if (!isMatch)
+      throw new UnauthorizedException({
+        message: this.i18n.t('auth.INVALID_REFRESH_TOKEN'),
+      });
+
+    return this.login(user);
   }
 }

@@ -5,15 +5,16 @@ import { PublicUserData } from './types/public-user-data';
 import { User } from '../entities/User';
 import * as bcrypt from 'bcrypt';
 import { IUserService } from './interfaces/IUserService';
+import { I18nService } from 'nestjs-i18n';
 
 @Injectable()
 export class UsersService implements IUserService {
-  constructor(private usersRepository: UsersRepository) {}
+  constructor(private usersRepository: UsersRepository, private i18n: I18nService) {}
 
   async create(data: CreateUserData): Promise<PublicUserData> {
     const userAlreadyExists = this.usersRepository.findByEmail(data.email);
 
-    if (userAlreadyExists) throw new HttpException('User already exists', 409);
+    if (userAlreadyExists) throw new HttpException(this.i18n.t('users.USER_ALREADY_EXISTS'), 409);
 
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(data.password, salt);
@@ -43,7 +44,7 @@ export class UsersService implements IUserService {
     const user = this.usersRepository.findById(id);
 
     if (!user) {
-      throw new HttpException('User not found', 404);
+      throw new HttpException(this.i18n.t('users.USER_NOT_FOUND'), 404);
     }
 
     return user;
@@ -53,7 +54,7 @@ export class UsersService implements IUserService {
     const user = this.usersRepository.findByEmail(email);
 
     if (!user) {
-      throw new HttpException('User not found', 404);
+      throw new HttpException(this.i18n.t('users.USER_NOT_FOUND'), 404);
     }
 
     return user;
@@ -63,7 +64,7 @@ export class UsersService implements IUserService {
     const user = this.usersRepository.findById(id);
 
     if (!user) {
-      throw new HttpException('User not found', 404);
+      throw new HttpException(this.i18n.t('users.USER_NOT_FOUND'), 404);
     }
 
     return {
@@ -77,7 +78,7 @@ export class UsersService implements IUserService {
     const user = this.usersRepository.findByEmail(email);
 
     if (!user) {
-      throw new HttpException('User not found', 404);
+      throw new HttpException(this.i18n.t('users.USER_NOT_FOUND'), 404);
     }
 
     return {
