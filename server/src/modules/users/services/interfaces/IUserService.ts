@@ -1,6 +1,6 @@
 import { CreateUserData} from '../types/create-user-data';
 import { PublicUserData} from '../types/public-user-data';
-import { User } from 'src/users/entities/User';
+import { User } from 'src/modules/users/entities/User';
 
 export interface IUserService {
   create(data: CreateUserData): Promise<PublicUserData>;

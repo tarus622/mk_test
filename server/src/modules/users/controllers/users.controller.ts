@@ -9,7 +9,7 @@ import {
 } from '@nestjs/common';
 import { Request } from 'express';
 import { UsersService } from '../services/users.service';
-import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { JwtAuthGuard } from 'src/modules/auth/guards/jwt-auth.guard';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { PublicUserData } from './types/public-user-data';
 import { HttpExceptionFilter } from 'src/filters/http-exception.filter';

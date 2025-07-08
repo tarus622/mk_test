@@ -7,7 +7,7 @@ import {
   UseFilters,
 } from '@nestjs/common';
 import { Request } from 'express';
-import { AuthService } from 'src/auth/services/auth.service';
+import { AuthService } from '../services/auth.service';
 import { LocalAuthGuard } from '../guards/local-auth.guard';
 import { HttpExceptionFilter } from 'src/filters/http-exception.filter';
 
