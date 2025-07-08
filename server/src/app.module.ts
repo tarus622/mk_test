@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { CacheModule } from '@nestjs/cache-manager';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { ConfigModule } from '@nestjs/config';
@@ -26,6 +27,7 @@ import { join } from 'path';
         new HeaderResolver(['x-lang']),
       ],
     }),
+    CacheModule.register({isGlobal: true, ttl: 60000}),
     AuthModule,
     UsersModule,
     ConfigModule.forRoot({ isGlobal: true }),

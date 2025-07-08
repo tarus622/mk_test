@@ -6,7 +6,7 @@ import { I18nService } from 'nestjs-i18n';
 
 @Injectable()
 export class UsersRepository implements IUserRepository {
-  constructor(private i18n: I18nService){}
+  constructor(private i18n: I18nService) {}
   private users: User[] = [];
 
   create(email: string, password: string): User {
@@ -35,11 +35,13 @@ export class UsersRepository implements IUserRepository {
     return user;
   }
 
-  updateRefreshToken(id: string, token: string): string | null {
-    const user = this.users.find((user: User) => user.getId() === id);
-    if (!user) throw new HttpException(this.i18n.t('users.USER_NOT_FOUND'), 404);
+  updateRefreshToken(id: string, token: string): User {
+    const user = this.users.find((user: User) => user.getId() === id) || null;
+    if (!user)
+      throw new HttpException(this.i18n.t('users.USER_NOT_FOUND'), 404);
 
     user.setRefreshToken(token);
-    return user.getRefreshToken() || null;
+
+    return user;
   }
 }

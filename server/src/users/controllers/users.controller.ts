@@ -13,7 +13,6 @@ import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { PublicUserData } from './types/public-user-data';
 import { HttpExceptionFilter } from 'src/filters/http-exception.filter';
-import { I18nService, I18nContext, I18n } from 'nestjs-i18n';
 
 @UseFilters(new HttpExceptionFilter())
 @Controller('users')
@@ -21,26 +20,26 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Post()
-  createUser(
+  async createUser(
     @Body() data: CreateUserDto,
   ): Promise<PublicUserData> {
-    const user = this.usersService.create(data);
+    const user = await this.usersService.create(data);
     return user;
   }
 
   @UseGuards(JwtAuthGuard)
   @Get()
-  getUsers(@Req() req: Request): PublicUserData[] {
-    const users = this.usersService.getAllUsers();
+  async getUsers(@Req() req: Request): Promise<Partial<PublicUserData>[]> {
+    const users = await this.usersService.getAllUsers();
 
     return users;
   }
 
   @UseGuards(JwtAuthGuard)
   @Get('/:id')
-  getUserById(@Req() req: Request): PublicUserData {
+  async getUserById(@Req() req: Request): Promise<PublicUserData> {
     const { id } = req.params;
-    const user = this.usersService.findPublicById(id);
+    const user = await this.usersService.findPublicById(id);
 
     return user;
   }

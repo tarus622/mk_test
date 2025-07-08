@@ -14,7 +14,7 @@ export class AuthService implements IAuthService {
   ) {}
 
   async validateUser(email: string, password: string): Promise<any> {
-    const user = this.usersService.findByEmail(email);
+    const user = await this.usersService.findByEmail(email);
     if (user && (await bcrypt.compare(password, user.getPassword()))) {
       return user;
     }
@@ -62,7 +62,7 @@ export class AuthService implements IAuthService {
       });
     }
 
-    const user = this.usersService.findById(payload.sub);
+    const user = await this.usersService.findById(payload.sub);
 
     const isMatch = await bcrypt.compare(refreshToken, user?.getRefreshToken());
 
