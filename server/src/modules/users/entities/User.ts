@@ -2,12 +2,14 @@ export class User {
   private id: string;
   private email: string;
   private password: string;
+  private permission: string;
   private refresh_token?: string;
 
-  constructor(id: string, email: string, password: string) {
+  constructor(id: string, email: string, password: string, permission: string) {
     this.id = id;
     this.email = email;
     this.password = password;
+    this.permission = permission;
   }
 
   getId() {
@@ -20,6 +22,10 @@ export class User {
 
   getPassword() {
     return this.password;
+  }
+
+  getPermission() {
+    return this.permission;
   }
 
   getRefreshToken() {
@@ -38,7 +44,15 @@ export class User {
     this.password = password;
   }
 
+  setPermission(permission: string) {
+    this.permission = permission;
+  }
+
   setRefreshToken(token: string) {
     this.refresh_token = token;
+  }
+
+  revokeToken() {
+    this.refresh_token = '';
   }
 }

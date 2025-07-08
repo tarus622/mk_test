@@ -1,5 +1,5 @@
-import { CreateUserData} from '../types/create-user-data';
-import { PublicUserData} from '../types/public-user-data';
+import { CreateUserData } from '../types/create-user-data';
+import { PublicUserData } from '../types/public-user-data';
 import { User } from 'src/modules/users/entities/User';
 
 export interface IUserService {
@@ -9,4 +9,6 @@ export interface IUserService {
   findByEmail(email: string): Promise<User>;
   findPublicByEmail(email: string): Promise<PublicUserData>;
   findPublicById(id: string): Promise<PublicUserData>;
+  updateRefreshToken(id: string, token: string): Promise<string>;
+  revokeToken(id: string): Promise<void>;
 }

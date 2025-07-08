@@ -2,6 +2,7 @@ import { HttpException, Inject, Injectable } from '@nestjs/common';
 import { UsersRepository } from '../repositories/users.repository';
 import { CreateUserData } from './types/create-user-data';
 import { PublicUserData } from './types/public-user-data';
+import { UserPermission } from 'src/enums/user-permission.enum';
 import { User } from '../entities/User';
 import * as bcrypt from 'bcrypt';
 import { IUserService } from './interfaces/IUserService';
@@ -25,7 +26,11 @@ export class UsersService implements IUserService {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(data.password, salt);
 
-    const newUser = this.usersRepository.create(data.email, hashedPassword);
+    const newUser = this.usersRepository.create(
+      data.email,
+      hashedPassword,
+      UserPermission.USER,
+    );
 
     return {
       id: newUser.getId(),
@@ -146,5 +151,16 @@ export class UsersService implements IUserService {
     ]);
 
     return user.getRefreshToken() as string;
+  }
+
+  async revokeToken(id: string): Promise<void> {
+    const user = this.usersRepository.revokeToken(id);
+
+    await Promise.all([
+      this.cacheManager.del(`users:public:email:${user.getEmail()}`),
+      this.cacheManager.del(`users:public:id:${user.getId()}`),
+      this.cacheManager.del(`users:email:${user.getEmail()}`),
+      this.cacheManager.del(`users:id:${user.getId()}`),
+    ]);
   }
 }

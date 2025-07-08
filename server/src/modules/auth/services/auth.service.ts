@@ -4,6 +4,7 @@ import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { IAuthService } from './interfaces/IAuthService';
 import { I18nService } from 'nestjs-i18n';
+import { User } from 'src/modules/users/entities/User';
 
 @Injectable()
 export class AuthService implements IAuthService {
@@ -13,7 +14,7 @@ export class AuthService implements IAuthService {
     private i18n: I18nService,
   ) {}
 
-  async validateUser(email: string, password: string): Promise<any> {
+  async validateUser(email: string, password: string): Promise<User | null> {
     const user = await this.usersService.findByEmail(email);
     if (user && (await bcrypt.compare(password, user.getPassword()))) {
       return user;
@@ -22,7 +23,13 @@ export class AuthService implements IAuthService {
   }
 
   async login(user: any) {
-    const payload = { email: user.email, sub: user.id };
+    const userFound = await this.usersService.findById(user.id);
+
+    const payload = {
+      username: userFound.getEmail(),
+      sub: userFound.getId(),
+      permission: userFound.getPermission(),
+    };
 
     const access_token = await this.jwtService.signAsync(
       { ...payload, type: 'access' },
@@ -40,7 +47,7 @@ export class AuthService implements IAuthService {
     const salt = await bcrypt.genSalt(10);
     const hashedToken = await bcrypt.hash(refresh_token, salt);
 
-    this.usersService.updateRefreshToken(user.id, hashedToken);
+    await this.usersService.updateRefreshToken(user.id, hashedToken);
 
     return { access_token, refresh_token };
   }
@@ -56,7 +63,7 @@ export class AuthService implements IAuthService {
       });
     }
 
-    if (payload.type !== 'refresh') { 
+    if (payload.type !== 'refresh') {
       throw new UnauthorizedException({
         message: this.i18n.t('auth.INVALID_REFRESH_TOKEN'),
       });
@@ -66,10 +73,13 @@ export class AuthService implements IAuthService {
 
     const isMatch = await bcrypt.compare(refreshToken, user?.getRefreshToken());
 
-    if (!isMatch)
+    if (!isMatch) {
+      this.usersService.revokeToken(user.getId());
+
       throw new UnauthorizedException({
         message: this.i18n.t('auth.INVALID_REFRESH_TOKEN'),
       });
+    }
 
     return this.login(user);
   }
