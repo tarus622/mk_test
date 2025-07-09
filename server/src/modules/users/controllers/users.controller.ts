@@ -12,7 +12,7 @@ import { UsersService } from '../services/users.service';
 import { JwtAuthGuard } from 'src/modules/auth/guards/jwt-auth.guard';
 import { Permission } from 'src/modules/auth/guards/helpers/permission.decorator';
 import { CreateUserDto } from './dtos/create-user.dto';
-import { PublicUserData } from './types/public-user-data';
+import { PublicUserData } from './types/PublicUserData';
 import { HttpExceptionFilter } from 'src/filters/http-exception.filter';
 import { PermissionGuard } from 'src/modules/auth/guards/permission.guard';
 import { UserPermission } from 'src/enums/user-permission.enum';

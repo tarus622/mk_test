@@ -29,7 +29,7 @@ export class User {
   }
 
   getRefreshToken() {
-    return this.refresh_token;
+    return this.refresh_token || null;
   }
 
   setId(id: string) {

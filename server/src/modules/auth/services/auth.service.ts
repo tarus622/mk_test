@@ -4,7 +4,7 @@ import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { IAuthService } from './interfaces/IAuthService';
 import { I18nService } from 'nestjs-i18n';
-import { User } from 'src/modules/users/entities/User';
+import { UserData } from './types/UserData';
 
 @Injectable()
 export class AuthService implements IAuthService {
@@ -14,21 +14,24 @@ export class AuthService implements IAuthService {
     private i18n: I18nService,
   ) {}
 
-  async validateUser(email: string, password: string): Promise<User | null> {
+  async validateUser(
+    email: string,
+    password: string,
+  ): Promise<UserData | null> {
     const user = await this.usersService.findByEmail(email);
-    if (user && (await bcrypt.compare(password, user.getPassword()))) {
+    if (user && (await bcrypt.compare(password, user.password))) {
       return user;
     }
     return null;
   }
 
-  async login(user: User) {
-    const userFound = await this.usersService.findById(user.getId());
+  async login(user: UserData): Promise<{ access_token: string; refresh_token: string }> {
+    const userFound = await this.usersService.findById(user.id);
 
     const payload = {
-      username: userFound.getEmail(),
-      sub: userFound.getId(),
-      permission: userFound.getPermission(),
+      username: userFound.email,
+      sub: userFound.id,
+      permission: userFound.permission,
     };
 
     const access_token = await this.jwtService.signAsync(
@@ -47,12 +50,12 @@ export class AuthService implements IAuthService {
     const salt = await bcrypt.genSalt(10);
     const hashedToken = await bcrypt.hash(refresh_token, salt);
 
-    await this.usersService.updateRefreshToken(user.getId(), hashedToken);
+    await this.usersService.updateRefreshToken(user.id, hashedToken);
 
     return { access_token, refresh_token };
   }
 
-  async refreshToken(refreshToken: string) {
+  async refreshToken(refreshToken: string): Promise<{ access_token: string; refresh_token: string }> {
     let payload: any;
 
     try {
@@ -71,10 +74,10 @@ export class AuthService implements IAuthService {
 
     const user = await this.usersService.findById(payload.sub);
 
-    const isMatch = await bcrypt.compare(refreshToken, user?.getRefreshToken());
+    const isMatch = await bcrypt.compare(refreshToken, user?.refresh_token);
 
     if (!isMatch) {
-      this.usersService.revokeToken(user.getId());
+      this.usersService.revokeToken(user.id);
 
       throw new UnauthorizedException({
         message: this.i18n.t('auth.INVALID_REFRESH_TOKEN'),

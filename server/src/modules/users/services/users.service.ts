@@ -1,13 +1,13 @@
 import { HttpException, Inject, Injectable } from '@nestjs/common';
 import { UsersRepository } from '../repositories/users.repository';
-import { CreateUserData } from './types/create-user-data';
-import { PublicUserData } from './types/public-user-data';
+import { CreateUserData } from './types/CreateUserData';
+import { PublicUserData } from './types/PublicUserData';
 import { UserPermission } from 'src/enums/user-permission.enum';
-import { User } from '../entities/User';
 import * as bcrypt from 'bcrypt';
 import { IUserService } from './interfaces/IUserService';
 import { I18nService } from 'nestjs-i18n';
 import { Cache, CACHE_MANAGER } from '@nestjs/cache-manager';
+import { UserData } from './types/UserData';
 
 @Injectable()
 export class UsersService implements IUserService {
@@ -33,9 +33,9 @@ export class UsersService implements IUserService {
     );
 
     return {
-      id: newUser.getId(),
-      email: newUser.getEmail(),
-      refresh_token: newUser.getRefreshToken() || null,
+      id: newUser.id,
+      email: newUser.email,
+      refresh_token: newUser.refresh_token || null,
     };
   }
 
@@ -45,12 +45,12 @@ export class UsersService implements IUserService {
 
     if (cachedUsers) return cachedUsers;
 
-    const users = this.usersRepository.getAll();
+    const users: Partial<UserData>[] = this.usersRepository.getAll();
 
-    const mappedUsers = users.map((user: User) => {
+    const mappedUsers = users.map((user: Partial<UserData>) => {
       return {
-        id: user.getId(),
-        email: user.getEmail(),
+        id: user.id,
+        email: user.email,
       };
     });
 
@@ -60,8 +60,8 @@ export class UsersService implements IUserService {
     return mappedUsers;
   }
 
-  async findById(id: string): Promise<User> {
-    const cachedUser: User | null =
+  async findById(id: string): Promise<UserData> {
+    const cachedUser: UserData | null =
       (await this.cacheManager.get(`users:id:${id}`)) || null;
 
     if (cachedUser) return cachedUser;
@@ -77,8 +77,8 @@ export class UsersService implements IUserService {
     return user;
   }
 
-  async findByEmail(email: string): Promise<User> {
-    const cachedUser: User | null =
+  async findByEmail(email: string): Promise<UserData> {
+    const cachedUser: UserData | null =
       (await this.cacheManager.get(`users:email:${email}`)) || null;
 
     if (cachedUser) return cachedUser;
@@ -107,9 +107,9 @@ export class UsersService implements IUserService {
     }
 
     const publicUser: PublicUserData = {
-      id: user.getId(),
-      email: user.getEmail(),
-      refresh_token: user.getRefreshToken() || null,
+      id: user.id,
+      email: user.email,
+      refresh_token: user.refresh_token || null,
     };
 
     await this.cacheManager.set(`users:public:id:${id}`, publicUser);
@@ -130,9 +130,9 @@ export class UsersService implements IUserService {
     }
 
     const publicUser: PublicUserData = {
-      id: user.getId(),
-      email: user.getEmail(),
-      refresh_token: user.getRefreshToken() || null,
+      id: user.id,
+      email: user.email,
+      refresh_token: user.refresh_token || null,
     };
 
     await this.cacheManager.set(`users:public:email:${email}`, publicUser);
@@ -144,23 +144,23 @@ export class UsersService implements IUserService {
     const user = this.usersRepository.updateRefreshToken(id, token);
 
     await Promise.all([
-      this.cacheManager.del(`users:public:email:${user.getEmail()}`),
-      this.cacheManager.del(`users:public:id:${user.getId()}`),
-      this.cacheManager.del(`users:email:${user.getEmail()}`),
-      this.cacheManager.del(`users:id:${user.getId()}`),
+      this.cacheManager.del(`users:public:email:${user.email}`),
+      this.cacheManager.del(`users:public:id:${user.id}`),
+      this.cacheManager.del(`users:email:${user.email}`),
+      this.cacheManager.del(`users:id:${user.id}`),
     ]);
 
-    return user.getRefreshToken() as string;
+    return user.refresh_token as string;
   }
 
   async revokeToken(id: string): Promise<void> {
     const user = this.usersRepository.revokeToken(id);
 
     await Promise.all([
-      this.cacheManager.del(`users:public:email:${user.getEmail()}`),
-      this.cacheManager.del(`users:public:id:${user.getId()}`),
-      this.cacheManager.del(`users:email:${user.getEmail()}`),
-      this.cacheManager.del(`users:id:${user.getId()}`),
+      this.cacheManager.del(`users:public:email:${user.email}`),
+      this.cacheManager.del(`users:public:id:${user.id}`),
+      this.cacheManager.del(`users:email:${user.email}`),
+      this.cacheManager.del(`users:id:${user.id}`),
     ]);
   }
 }
