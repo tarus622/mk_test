@@ -16,7 +16,7 @@ export class UsersRepository implements IUserRepository {
     return user;
   }
 
-  getAll(): User[] {
+  getAll(): User[] { 
     return this.users;
   }
 

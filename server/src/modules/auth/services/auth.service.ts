@@ -22,8 +22,8 @@ export class AuthService implements IAuthService {
     return null;
   }
 
-  async login(user: any) {
-    const userFound = await this.usersService.findById(user.id);
+  async login(user: User) {
+    const userFound = await this.usersService.findById(user.getId());
 
     const payload = {
       username: userFound.getEmail(),
@@ -47,7 +47,7 @@ export class AuthService implements IAuthService {
     const salt = await bcrypt.genSalt(10);
     const hashedToken = await bcrypt.hash(refresh_token, salt);
 
-    await this.usersService.updateRefreshToken(user.id, hashedToken);
+    await this.usersService.updateRefreshToken(user.getId(), hashedToken);
 
     return { access_token, refresh_token };
   }

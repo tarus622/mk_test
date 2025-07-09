@@ -3,6 +3,7 @@ import { PassportStrategy } from '@nestjs/passport';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { AuthService } from '../services/auth.service';
 import { I18nService } from 'nestjs-i18n';
+import { User } from 'src/modules/users/entities/User';
 
 @Injectable()
 export class LocalStrategy extends PassportStrategy(Strategy) {
@@ -10,7 +11,7 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
     super({ usernameField: 'email', passwordField: 'password' });
   }
 
-  async validate(username: string, password: string): Promise<any> {
+  async validate(username: string, password: string): Promise<User> {
     const user = await this.authService.validateUser(username, password);
     if (!user) {
       throw new UnauthorizedException({message: this.i18n.t('auth.INVALID_USER')});

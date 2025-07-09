@@ -15,6 +15,7 @@ import { CreateUserDto } from './dtos/create-user.dto';
 import { PublicUserData } from './types/public-user-data';
 import { HttpExceptionFilter } from 'src/filters/http-exception.filter';
 import { PermissionGuard } from 'src/modules/auth/guards/permission.guard';
+import { UserPermission } from 'src/enums/user-permission.enum';
 
 @UseFilters(new HttpExceptionFilter())
 @Controller('users')
@@ -28,7 +29,7 @@ export class UsersController {
   }
 
   @UseGuards(JwtAuthGuard, PermissionGuard)
-  @Permission('user')
+  @Permission(UserPermission.USER)
   @Get()
   async getUsers(@Req() req: Request): Promise<Partial<PublicUserData>[]> {
     const users = await this.usersService.getAllUsers();
@@ -37,7 +38,7 @@ export class UsersController {
   }
 
   @UseGuards(JwtAuthGuard, PermissionGuard)
-  @Permission('user')
+  @Permission(UserPermission.TRIAL)
   @Get('/:id')
   async getUserById(@Req() req: Request): Promise<PublicUserData> {
     const { id } = req.params;

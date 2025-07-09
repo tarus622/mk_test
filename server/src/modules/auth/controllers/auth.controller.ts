@@ -18,13 +18,17 @@ export class AuthController {
 
   @UseGuards(LocalAuthGuard)
   @Post('login')
-  async login(@Req() req: Request): Promise<any> {
-    const result = await this.authService.login(req.user);
-    return result;
+  async login(
+    @Req() req: Request,
+  ): Promise<{ access_token: string; refresh_token: string }> {
+    const tokens = await this.authService.login(req.user);
+    return tokens;
   }
 
   @Post('refresh')
-  async refreshToken(@Req() req: Request): Promise<any> {
+  async refreshToken(
+    @Req() req: Request,
+  ): Promise<{ access_token: string; refresh_token: string }> {
     const token = req.headers.authorization?.split(' ')[1];
     const result = await this.authService.refreshToken(token as string);
 
