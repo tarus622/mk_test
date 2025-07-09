@@ -18,6 +18,7 @@ export class UsersRepository implements IUserRepository {
   ): UserData {
     const user = new User(uuid(), email, password, permission);
     this.users.push(user);
+
     return {
       id: user.getId(),
       email: user.getEmail(),
