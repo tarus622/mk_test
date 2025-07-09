@@ -2,7 +2,7 @@ import { HttpException, Inject, Injectable } from '@nestjs/common';
 import { UsersRepository } from '../repositories/users.repository';
 import { CreateUserData } from './types/CreateUserData';
 import { PublicUserData } from './types/PublicUserData';
-import { UserPermission } from 'src/enums/user-permission.enum';
+import { UserPermission } from '../../../enums/user-permission.enum';
 import * as bcrypt from 'bcrypt';
 import { IUserService } from './interfaces/IUserService';
 import { I18nService } from 'nestjs-i18n';
