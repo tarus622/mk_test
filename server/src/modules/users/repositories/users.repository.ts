@@ -3,7 +3,7 @@ import { User } from '../entities/User';
 import { v4 as uuid } from 'uuid';
 import { IUserRepository } from './interfaces/IUserRepository';
 import { I18nService } from 'nestjs-i18n';
-import { UserPermission } from 'src/enums/user-permission.enum';
+import { UserPermission } from '../../../enums/user-permission.enum';
 import { UserData } from './types/UserData';
 
 @Injectable()
